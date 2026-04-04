@@ -160,19 +160,66 @@ namespace Brainstorm.Areas.Staff.Controllers
             return View(obj);
         }
 
-        //public IActionResult ViewDetails(int? id)
-        //{
-        //    if (id == null || id == 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var ideaFromDbFirst = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,Topic");
-        //    if (ideaFromDbFirst == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(ideaFromDbFirst);
-        //}
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            var ideaFromDbFirst = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,Topic,ApplicationUser");
+            if (ideaFromDbFirst == null)
+            {
+                return NotFound();
+            }
+            return View(ideaFromDbFirst);
+        }
+        
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePost(int? id) // Giả định khóa chính Idea của bạn là kiểu int
+        {
+            // 1. Lấy thông tin Idea cần xóa từ CSDL
+            var obj = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            // 2. Tìm tất cả các Lượt xem (View) tham chiếu đến Idea này
+            // Điều kiện: Lấy các View có thuộc tính IdeaId bằng với id của Idea đang xóa
+            var relatedViews = _unitOfWork.View.GetAll(v => v.IdeaId == id);
+            if (relatedViews.Any())
+            {
+                // Xóa danh sách View này
+                _unitOfWork.View.removeRange(relatedViews);
+            }
+
+            // 3. Tìm tất cả các Tương tác (React) tham chiếu đến Idea này
+            var relatedReacts = _unitOfWork.React.GetAll(r => r.IdeaId == id);
+            if (relatedReacts.Any())
+            {
+                // Xóa danh sách React này
+                _unitOfWork.React.removeRange(relatedReacts);
+            }
+
+            var relatedComments = _unitOfWork.Comment.GetAll(r => r.IdeaId == id);
+            if (relatedComments.Any())
+            {
+                // Xóa danh sách React này
+                _unitOfWork.Comment.removeRange(relatedComments);
+            }
+
+            // 4. Sau khi các dữ liệu liên quan đã bị xóa, ta có thể xóa Idea một cách an toàn
+            _unitOfWork.Idea.Remove(obj);
+
+            // 5. Lưu toàn bộ thay đổi xuống Cơ sở dữ liệu
+            _unitOfWork.Save();
+
+            // Thông báo thành công và chuyển hướng về trang danh sách
+            TempData["success"] = "Đã xóa Idea thành công!";
+            return RedirectToAction("Index");
+        }
 
         [Authorize]
         public IActionResult Views(int id)
