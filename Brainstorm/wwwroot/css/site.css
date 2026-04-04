@@ -8,8 +8,13 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus,
+.form-select:focus {
+  box-shadow: 0 0 0 0.12rem #fff, 0 0 0 0.28rem rgba(111, 66, 193, 0.35);
 }
 
 html {
@@ -19,4 +24,205 @@ html {
 
 body {
   margin-bottom: 60px;
+  background: radial-gradient(circle at top right, #f1e8ff 0%, #f6f8ff 38%, #eefaf8 100%);
+  color: #212529;
+}
+
+.app-shell .container {
+  max-width: 1160px;
+}
+
+.navbar-modern {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.brand-modern {
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #6f42c1, #2bb6a8);
+  box-shadow: 0 0 0 5px rgba(111, 66, 193, 0.12);
+}
+
+.navbar-modern .nav-link {
+  color: #212529;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+}
+
+.navbar-modern .nav-link:hover {
+  background: #efe7ff;
+  color: #5f33b5;
+}
+
+.home-modern-page {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.home-hero {
+  background: linear-gradient(135deg, rgba(111, 66, 193, 0.12), rgba(43, 182, 168, 0.15));
+  border: 1px solid rgba(111, 66, 193, 0.15);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.home-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.metric-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(18, 38, 63, 0.06);
+}
+
+.metric-day {
+  border-top: 4px solid #2bb6a8;
+}
+
+.metric-week {
+  border-top: 4px solid #6f42c1;
+}
+
+.metric-month {
+  border-top: 4px solid #ff7a59;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.metric-hint {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.idea-card-modern {
+  background: #ffffff;
+  border: 1px solid rgba(111, 66, 193, 0.12);
+  border-radius: 1rem;
+  box-shadow: 0 12px 30px rgba(18, 38, 63, 0.08);
+}
+
+.idea-content {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #2b2f35;
+}
+
+.comment-list {
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.comment-item {
+  background: #f8f9ff;
+  border: 1px solid #e5e7f5;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.empty-state-modern {
+  background: #fff;
+  border: 1px dashed #c8b4f0;
+  border-radius: 1rem;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.idea-submit-form {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 1rem;
+  border: 1px solid rgba(111, 66, 193, 0.14);
+  padding: 1rem;
+  box-shadow: 0 12px 28px rgba(18, 38, 63, 0.08);
+}
+
+.idea-submit-form .btn,
+.idea-submit-form .form-control,
+.idea-submit-form .form-select {
+  min-height: 44px;
+}
+
+.idea-submit-form #tagsPreview .badge {
+  font-size: 0.85rem;
+  background: #ede4ff !important;
+  color: #5f33b5;
+}
+
+.idea-submit-form .list-group-item {
+  border-radius: 0.65rem;
+  margin-bottom: 0.4rem;
+  border: 1px solid #ebe6f9;
+}
+
+.privacy-modern-page,
+.detail-modern-page {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.privacy-hero,
+.detail-header {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(111, 66, 193, 0.15);
+  border-radius: 1rem;
+  padding: 1.1rem 1.2rem;
+}
+
+.privacy-card,
+.detail-card {
+  background: #fff;
+  border: 1px solid rgba(111, 66, 193, 0.12);
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 10px 24px rgba(18, 38, 63, 0.07);
+}
+
+.privacy-card h5 {
+  margin-bottom: 0.65rem;
+}
+
+.detail-label {
+  font-size: 0.84rem;
+  color: #6c757d;
+  margin-bottom: 0.2rem;
+}
+
+.detail-value {
+  font-size: 1rem;
+  color: #212529;
+  line-height: 1.5;
+}
+
+@media (max-width: 767.98px) {
+  .home-title {
+    font-size: 1.45rem;
+  }
+
+  .metric-value {
+    font-size: 1.75rem;
+  }
 }
