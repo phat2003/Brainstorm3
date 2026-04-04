@@ -1,38 +1,51 @@
 ﻿@model View
 
 @{
-    ViewData["Title"] = "Chi tiết bài đăng";
+    ViewData["Title"] = "Chi tiết ý tưởng";
 }
 
-<div class="container p-3">
-    <h2 class="text-danger">@ViewData["Title"]</h2>
-    <hr />
-    @* <h4>Bạn có chắc chắn muốn xóa ý tưởng này?</h4> *@
-    <dl class="row">
-        <dt class="col-sm-2">Nội dung</dt>
-        <dd class="col-sm-10">@Model.Idea.Text</dd>
+<div class="detail-modern-page">
+    <div class="detail-header mb-3">
+        <h2 class="mb-1">@ViewData["Title"]</h2>
+        <p class="text-muted mb-0">Xem đầy đủ nội dung, danh mục và tệp đính kèm của ý tưởng.</p>
+    </div>
 
-        <dt class="col-sm-2">Danh mục</dt>
-        <dd class="col-sm-10">@Model.Idea.Category?.Name</dd>
+    <article class="detail-card">
+        <div class="row g-3">
+            <div class="col-12">
+                <div class="detail-label">Nội dung</div>
+                <div class="detail-value">@Model.Idea.Text</div>
+            </div>
 
-        <dt class="col-sm-2">Chủ đề</dt>
-        <dd class="col-sm-10">@Model.Idea.Topic?.Name</dd>
+            <div class="col-12 col-md-6">
+                <div class="detail-label">Danh mục</div>
+                <div class="detail-value">@Model.Idea.Category?.Name</div>
+            </div>
 
-        <dt class="col-sm-2">Ngày tạo</dt>
-        <dd class="col-sm-10">@Model.Idea.CreatedDate.ToString("dd/MM/yyyy HH:mm")</dd>
+            <div class="col-12 col-md-6">
+                <div class="detail-label">Chủ đề</div>
+                <div class="detail-value">@Model.Idea.Topic?.Name</div>
+            </div>
 
-        @if (!string.IsNullOrEmpty(Model.Idea.FilePath))
-        {
-            <dt class="col-sm-2">Tệp đính kèm</dt>
-            <dd class="col-sm-10">
-                <a href="~/@Model.Idea.FilePath" target="_blank">Xem file</a>
-            </dd>
-        }
-    </dl>
-    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-    @* <form asp-action="DeletePost" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Xóa</button>
+            <div class="col-12 col-md-6">
+                <div class="detail-label">Ngày tạo</div>
+                <div class="detail-value">@Model.Idea.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
 
-    </form> *@
+            @if (!string.IsNullOrEmpty(Model.Idea.FilePath))
+            {
+                <div class="col-12 col-md-6">
+                    <div class="detail-label">Tệp đính kèm</div>
+                    <div class="detail-value">
+                        <a href="~/@Model.Idea.FilePath" target="_blank" class="btn btn-outline-primary btn-sm">Xem file</a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4 d-flex gap-2 flex-wrap">
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+            <a asp-action="Upsert" asp-route-id="@Model.Idea.Id" class="btn btn-outline-primary">Chỉnh sửa</a>
+        </div>
+    </article>
 </div>
