@@ -94,7 +94,7 @@ namespace Brainstorm.Areas.Staff.Controllers
 
         }
         [HttpPost]
-        [Authorize]
+        
         public IActionResult Upsert(IdeaVM obj, IFormFile? filepath)
         {
             if (ModelState.IsValid)
@@ -160,6 +160,7 @@ namespace Brainstorm.Areas.Staff.Controllers
             return View(obj);
         }
 
+        [Authorize]
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0)
@@ -249,14 +250,22 @@ namespace Brainstorm.Areas.Staff.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]//chức năng này chỉ dành cho người dùng đăng nhập
+        
         public IActionResult Views(View view)
         {
             view.Id = 0;
             var claimsIdentity = (ClaimsIdentity)User.Identity;//lấy thông tin người dùng đang đăng nhập
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);//lấy id của người dùng đang đăng nhập
-            view.ApplicationUserId = claim.Value;//gán id của người dùng đang đăng nhập vào thuộc tính ApplicationUserId của shoppingCart
+            //view.ApplicationUserId = claim.Value;//gán id của người dùng đang đăng nhập vào thuộc tính ApplicationUserId của shoppingCart
 
+            if(claim != null) {
+                view.ApplicationUserId = claim.Value;//gán id của người dùng đang đăng nhập vào thuộc tính ApplicationUserId của shoppingCart
+            }
+            else
+            {
+                TempData["Error"] = "Bạn cần đăng nhập để xem chi tiết ý tưởng!";
+                return RedirectToAction(nameof(Index));
+            }
             View viewObj = _unitOfWork.View.GetFirstOrDefault(u => u.ApplicationUserId == claim.Value && u.IdeaId == view.IdeaId);//kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng của người dùng chưa
 
             if (viewObj == null)
@@ -376,7 +385,7 @@ namespace Brainstorm.Areas.Staff.Controllers
         }
 
         [HttpPost]
-        
+        [Authorize]
         public IActionResult DeleteComment(int commentId)
         {
             // Lấy ID người dùng đang đăng nhập

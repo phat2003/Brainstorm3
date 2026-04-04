@@ -7,6 +7,13 @@
     <a asp-controller="Home" asp-action="Upsert" class="btn btn-primary">
         <i class="bi bi-plus-circle"></i> Đóng Góp Ý Tưởng
     </a>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mt-2">
+            @TempData["Error"]
+        </div>
+    }
     @foreach (var idea in Model)
     {
         <div class="card mb-4 shadow-sm">
@@ -138,8 +145,10 @@
                         <button type="submit" class="btn btn-danger">
                             Views
                         </button>
+                        
                     </form>
-                    @if (UserManager.GetUserId(User) == idea.idea.ApplicationUserId)
+                    
+                    @if (UserManager.GetUserId(User) == idea.idea.ApplicationUserId)//chỉ cho phép người đăng xoá ý tưởng của mình
                     {
 
                         <a asp-controller="Home" asp-action="Delete" asp-route-id="@idea.idea.Id" class="btn btn-danger mx-2"> <i class="bi bi-trash-fill">xoá</i></a>
