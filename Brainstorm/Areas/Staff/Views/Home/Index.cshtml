@@ -25,6 +25,13 @@
                 Đóng góp ý tưởng mới
             </a>
         </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger mt-3 mb-0">
+                @TempData["Error"]
+            </div>
+        }
     </section>
 
     <section class="row g-3 mb-4" aria-label="Thống kê ý tưởng">
@@ -128,6 +135,11 @@
                                 <input type="hidden" name="VisitTime" value="1" />
                                 <button type="submit" class="btn btn-outline-primary btn-sm">Xem chi tiết</button>
                             </form>
+
+                            @if (UserManager.GetUserId(User) == idea.idea.ApplicationUserId)
+                            {
+                                <a asp-controller="Home" asp-action="Delete" asp-route-id="@idea.idea.Id" class="btn btn-outline-danger btn-sm">Xóa ý tưởng</a>
+                            }
                         </div>
 
                         <div class="collapse" id="commentSection-@idea.idea.Id">

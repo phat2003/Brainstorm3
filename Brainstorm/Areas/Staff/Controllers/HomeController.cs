@@ -94,7 +94,7 @@ namespace Brainstorm.Areas.Staff.Controllers
 
         }
         [HttpPost]
-        [Authorize]
+        
         public IActionResult Upsert(IdeaVM obj, IFormFile? filepath)
         {
             if (ModelState.IsValid)
@@ -160,19 +160,67 @@ namespace Brainstorm.Areas.Staff.Controllers
             return View(obj);
         }
 
-        //public IActionResult ViewDetails(int? id)
-        //{
-        //    if (id == null || id == 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var ideaFromDbFirst = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,Topic");
-        //    if (ideaFromDbFirst == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(ideaFromDbFirst);
-        //}
+        [Authorize]
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            var ideaFromDbFirst = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,Topic,ApplicationUser");
+            if (ideaFromDbFirst == null)
+            {
+                return NotFound();
+            }
+            return View(ideaFromDbFirst);
+        }
+        
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePost(int? id) // Giả định khóa chính Idea của bạn là kiểu int
+        {
+            // 1. Lấy thông tin Idea cần xóa từ CSDL
+            var obj = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            // 2. Tìm tất cả các Lượt xem (View) tham chiếu đến Idea này
+            // Điều kiện: Lấy các View có thuộc tính IdeaId bằng với id của Idea đang xóa
+            var relatedViews = _unitOfWork.View.GetAll(v => v.IdeaId == id);
+            if (relatedViews.Any())
+            {
+                // Xóa danh sách View này
+                _unitOfWork.View.removeRange(relatedViews);
+            }
+
+            // 3. Tìm tất cả các Tương tác (React) tham chiếu đến Idea này
+            var relatedReacts = _unitOfWork.React.GetAll(r => r.IdeaId == id);
+            if (relatedReacts.Any())
+            {
+                // Xóa danh sách React này
+                _unitOfWork.React.removeRange(relatedReacts);
+            }
+
+            var relatedComments = _unitOfWork.Comment.GetAll(r => r.IdeaId == id);
+            if (relatedComments.Any())
+            {
+                // Xóa danh sách React này
+                _unitOfWork.Comment.removeRange(relatedComments);
+            }
+
+            // 4. Sau khi các dữ liệu liên quan đã bị xóa, ta có thể xóa Idea một cách an toàn
+            _unitOfWork.Idea.Remove(obj);
+
+            // 5. Lưu toàn bộ thay đổi xuống Cơ sở dữ liệu
+            _unitOfWork.Save();
+
+            // Thông báo thành công và chuyển hướng về trang danh sách
+            TempData["success"] = "Đã xóa Idea thành công!";
+            return RedirectToAction("Index");
+        }
 
         [Authorize]
         public IActionResult Views(int id)
@@ -202,14 +250,22 @@ namespace Brainstorm.Areas.Staff.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]//chức năng này chỉ dành cho người dùng đăng nhập
+        
         public IActionResult Views(View view)
         {
             view.Id = 0;
             var claimsIdentity = (ClaimsIdentity)User.Identity;//lấy thông tin người dùng đang đăng nhập
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);//lấy id của người dùng đang đăng nhập
-            view.ApplicationUserId = claim.Value;//gán id của người dùng đang đăng nhập vào thuộc tính ApplicationUserId của shoppingCart
+            //view.ApplicationUserId = claim.Value;//gán id của người dùng đang đăng nhập vào thuộc tính ApplicationUserId của shoppingCart
 
+            if(claim != null) {
+                view.ApplicationUserId = claim.Value;//gán id của người dùng đang đăng nhập vào thuộc tính ApplicationUserId của shoppingCart
+            }
+            else
+            {
+                TempData["Error"] = "Bạn cần đăng nhập để xem chi tiết ý tưởng!";
+                return RedirectToAction(nameof(Index));
+            }
             View viewObj = _unitOfWork.View.GetFirstOrDefault(u => u.ApplicationUserId == claim.Value && u.IdeaId == view.IdeaId);//kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng của người dùng chưa
 
             if (viewObj == null)
@@ -329,7 +385,7 @@ namespace Brainstorm.Areas.Staff.Controllers
         }
 
         [HttpPost]
-        
+        [Authorize]
         public IActionResult DeleteComment(int commentId)
         {
             // Lấy ID người dùng đang đăng nhập
