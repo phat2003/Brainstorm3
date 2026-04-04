@@ -1,0 +1,38 @@
+﻿@model IEnumerable<UserRoleVM>
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Danh sách Người dùng</h2>
+        </div>
+    </div>
+
+    <br /><br />
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Tên đăng nhập (UserName)</th>
+                <th>Vai trò (Role)</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.UserName</td>
+                    <td>@item.Role</td>
+                    <td>
+                        <a asp-controller="User" asp-action="EditRole" asp-route-userId="@item.UserId" class="btn btn-success mx-2">
+                            Phân quyền
+                        </a>
+                        <a asp-controller="User" asp-action="Delete" asp-route-userId="@item.UserId" class="btn btn-success mx-2">
+                            Xoá
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

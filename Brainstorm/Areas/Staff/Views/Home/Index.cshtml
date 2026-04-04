@@ -1,0 +1,146 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<IdeaVM>
+@inject UserManager<IdentityUser> UserManager
+
+<div class="container py-4" style="max-width: 600px;">
+    <h2 class="mb-4 text-primary">Bảng Tin Ý Tưởng</h2>
+    <a asp-controller="Home" asp-action="Upsert" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Đóng Góp Ý Tưởng
+    </a>
+    @foreach (var idea in Model)
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                    <img src="https://ui-avatars.com/api/?name=@idea.idea.ApplicationUser.UserName&background=random"
+                         class="rounded-circle me-2" width="40" height="40" alt="avatar" />
+                    <div>
+                        <strong>@idea.idea.ApplicationUser.UserName</strong><br />
+                        <small class="text-muted">@idea.idea.CreatedDate.ToString("dd/MM/yyyy")</small>
+                    </div>
+                </div>
+                <p class="card-text fs-5">@idea.idea.Text</p>
+                <div class="mb-2">
+
+                    <span class="badge bg-secondary">Lượt xem: @(idea.ViewCount)</span>
+                </div>
+                <div>
+
+
+
+                    @if (idea.react == null || idea.react.ReactValue != 1)
+                    {
+                    <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
+                        <input type="hidden" name="ideaId" value="@idea.idea.Id" />
+                        <input type="hidden" name="reactValue" value="1" />
+                        <button type="submit" class="btn btn-outline-success btn-sm">
+                            (@idea.LikeCount)👍 Thích
+                        </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
+                            <input type="hidden" name="ideaId" value="@idea.idea.Id" />
+                            <input type="hidden" name="reactValue" value="1" />
+                            <button type="submit" class="btn btn-outline-success btn-sm">
+                                (@idea.LikeCount)👍 Bỏ Thích
+                            </button>
+                        </form>
+                    }
+
+                    @if (idea.react == null || idea.react.ReactValue != -1)
+                    {
+                    <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
+                        <input type="hidden" name="ideaId" value="@idea.idea.Id" />
+                        <input type="hidden" name="reactValue" value="-1" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            (@idea.DislikeCount)👎 Không thích
+                        </button>
+                    </form>
+                    }
+                    else
+                    {
+                        <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
+                            <input type="hidden" name="ideaId" value="@idea.idea.Id" />
+                            <input type="hidden" name="reactValue" value="-1" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                (@idea.DislikeCount)👎 Bỏ Không thích
+                            </button>
+                        </form>
+                    }
+
+                    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#commentSection-@idea.idea.Id" aria-expanded="false" aria-controls="commentSection-@idea.idea.Id">
+                        <i class="bi bi-chat-dots"></i> Bình luận (@idea.Comments?.Count())
+                    </button>
+
+                    <div class="collapse mt-3 w-100" id="commentSection-@idea.idea.Id">
+
+                        <div class="mb-3" style="max-height: 200px; overflow-y: auto;">
+                            @if (idea.Comments != null && idea.Comments.Any())
+                            {
+                                @foreach (var comment in idea.Comments)
+                                {
+                                    <div class="bg-light p-2 rounded mb-2 border position-relative">
+                                        <strong>@(comment.ApplicationUser != null ? comment.ApplicationUser.UserName : "Ẩn danh")</strong>
+                                        <small class="text-muted ms-2">@comment.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+
+                                        <p class="mb-0 mt-1">@comment.Text</p>
+
+                                        @if (UserManager.GetUserId(User) == comment.ApplicationUserId)
+                                        {
+                                            <div class="position-absolute top-0 end-0 p-2">
+                                                <button class="btn btn-outline-primary btn-sm shadow-sm me-1" type="button" data-bs-toggle="collapse" data-bs-target="#editComment-@comment.Id" title="Sửa">
+                                                    <i class="bi bi-pencil-square"></i> Sửa
+                                                </button>
+
+                                                <form asp-area="Staff" asp-controller="Home" asp-action="DeleteComment" method="post" style="display:inline;">
+                                                    <input type="hidden" name="commentId" value="@comment.Id" />
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm shadow-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa bình luận này không?');" title="Xóa">
+                                                        <i class="bi bi-trash"></i> Xóa
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                            <div class="collapse mt-3" id="editComment-@comment.Id">
+                                                <form asp-area="Staff" asp-controller="Home" asp-action="UpdateComment" method="post">
+                                                    <input type="hidden" name="commentId" value="@comment.Id" />
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" name="newText" class="form-control" value="@comment.Text" required />
+                                                        <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-muted small">Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>
+                            }
+                        </div>
+
+                        <form asp-area="Staff" asp-controller="Home" asp-action="AddComment" method="post">
+                            <input type="hidden" name="IdeaId" value="@idea.idea.Id" />
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="Text" class="form-control" placeholder="Viết bình luận của bạn..." required />
+                                <button type="submit" class="btn btn-primary">Gửi</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <form asp-action="Views" method="post">
+                        <input type="hidden" name="IdeaId" value="@idea.idea.Id" />
+
+                        <input type="hidden" name="VisitTime" value="1" />
+
+                        <button type="submit" class="btn btn-danger">
+                            Views
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

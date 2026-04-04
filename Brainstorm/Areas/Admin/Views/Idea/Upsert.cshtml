@@ -1,0 +1,61 @@
+﻿@model IdeaVM
+
+@{
+    ViewData["Title"] = Model.idea.Id == 0 ? "Thêm Ý Tưởng" : "Cập Nhật Ý Tưởng";
+    var isEdit = Model.idea.Id != 0;
+}
+
+<div class="container p-3">
+    <h2 class="text-primary">@ViewData["Title"]</h2>
+    <hr />
+    <form asp-action="Upsert" enctype="multipart/form-data" method="post">
+        @if (isEdit)
+        {
+            @Html.HiddenFor(m => m.idea.Id)
+        }
+        <div class="mb-3">
+            <label asp-for="idea.Text" class="form-label"></label>
+            <textarea asp-for="idea.Text" class="form-control"></textarea>
+            <span asp-validation-for="idea.Text" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="idea.CategoryId" class="form-label"></label>
+            <select asp-for="idea.CategoryId" class="form-select" asp-items="Model.CategoryList">
+                <option value="">-- Chọn Danh Mục --</option>
+            </select>
+            <span asp-validation-for="idea.CategoryId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="idea.TopicId" class="form-label"></label>
+            <select asp-for="idea.TopicId" class="form-select" asp-items="Model.TopicList">
+                <option value="">-- Chọn Chủ Đề --</option>
+            </select>
+            <span asp-validation-for="idea.TopicId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Tệp đính kèm (nếu có)</label>
+            <input type="file" name="filepath" class="form-control" />
+            @if (!string.IsNullOrEmpty(Model.idea.FilePath))
+            {
+                <div class="mt-2">
+                    <span>File hiện tại: </span>
+                    <a href="~/@Model.idea.FilePath" target="_blank">Xem file</a>
+                </div>
+            }
+        </div>
+        @if (Model.idea.Id ==0)
+        {
+            <button type="submit" class="btn btn-primary">Tạo</button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-primary">cập nhật</button>
+        }
+        
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

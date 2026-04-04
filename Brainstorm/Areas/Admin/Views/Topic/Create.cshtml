@@ -1,0 +1,51 @@
+﻿@model Topic
+
+<form method="post" asp-action="Create">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Tạo Chủ Đề Mới</h2>
+            <hr />
+        </div>
+
+        @* Hiển thị tổng hợp lỗi nếu có *@
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        @* Nhập Tên Chủ Đề *@
+        <div class="mb-3">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        @* Nhập Hạn Nộp Ý Tưởng *@
+        <div class="mb-3">
+            <label asp-for="ClosureDate"></label>
+            <input asp-for="ClosureDate" class="form-control" type="datetime-local" />
+            <span asp-validation-for="ClosureDate" class="text-danger"></span>
+        </div>
+
+        @* Nhập Hạn Đóng Bình Luận *@
+        <div class="mb-3">
+            <label asp-for="FinalClosureDate"></label>
+            <input asp-for="FinalClosureDate" class="form-control" type="datetime-local" />
+            <span asp-validation-for="FinalClosureDate" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-primary form-control">Tạo Mới</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Topic" asp-action="Index" class="btn btn-secondary border form-control">
+                    Quay Lại
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
