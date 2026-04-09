@@ -1,61 +1,61 @@
 ﻿@model IdeaVM
 
 @{
-    ViewData["Title"] = "Đóng góp ý tưởng";
+    ViewData["Title"] = "Submit Idea";
 }
 
 <div class="container py-3">
     <h2 class="text-primary mb-3">@ViewData["Title"]</h2>
-    <p class="text-muted">Điền thông tin bên dưới để gửi ý tưởng mới.</p>
+    <p class="text-muted">Fill in the form below to submit a new idea.</p>
 
     <div id="closureAlert" class="alert alert-warning d-none" role="alert" aria-live="polite"></div>
 
     <form id="ideaSubmitForm" class="idea-submit-form" action="/api/ideas" method="post" enctype="multipart/form-data" novalidate>
         <div class="row g-3">
             <div class="col-12 col-md-6">
-                <label for="title" class="form-label">Tiêu đề</label>
+                <label for="title" class="form-label">Title</label>
                 <input id="title" name="title" type="text" maxlength="150" class="form-control" aria-describedby="titleHelp titleError" />
-                <div id="titleHelp" class="form-text">Tối đa 150 ký tự.</div>
+                <div id="titleHelp" class="form-text">Maximum 150 characters.</div>
                 <div id="titleError" class="text-danger small" aria-live="polite"></div>
             </div>
 
             <div class="col-12 col-md-6">
-                <label for="departmentId" class="form-label">Khoa</label>
+                <label for="departmentId" class="form-label">Department</label>
                 <select id="departmentId" name="departmentId" class="form-select" aria-describedby="departmentHelp departmentError">
-                    <option value="">Đang tải khoa...</option>
+                    <option value="">Loading departments...</option>
                 </select>
-                <div id="departmentHelp" class="form-text">Vui lòng chọn khoa của bạn.</div>
+                <div id="departmentHelp" class="form-text">Please select your department.</div>
                 <div id="departmentError" class="text-danger small" aria-live="polite"></div>
             </div>
 
             <div class="col-12">
-                <label for="description" class="form-label">Mô tả</label>
+                <label for="description" class="form-label">Description</label>
                 <textarea id="description" name="description" maxlength="5000" rows="5" class="form-control" aria-describedby="descriptionHelp descriptionError"></textarea>
-                <div id="descriptionHelp" class="form-text">Nội dung chi tiết ý tưởng (tối đa 5000 ký tự).</div>
+                <div id="descriptionHelp" class="form-text">Detailed idea content (maximum 5000 characters).</div>
                 <div id="descriptionError" class="text-danger small" aria-live="polite"></div>
             </div>
 
             <div class="col-12 col-md-6">
-                <label for="categories" class="form-label">Danh mục</label>
+                <label for="categories" class="form-label">Categories</label>
                 <select id="categories" name="categories" class="form-select" multiple size="6" aria-describedby="categoriesHelp categoriesError">
-                    <option value="">Đang tải danh mục...</option>
+                    <option value="">Loading categories...</option>
                 </select>
-                <div id="categoriesHelp" class="form-text">Giữ Ctrl (hoặc Cmd trên Mac) để chọn nhiều danh mục bằng bàn phím.</div>
+                <div id="categoriesHelp" class="form-text">Hold Ctrl (or Cmd on Mac) to select multiple categories.</div>
                 <div id="categoriesError" class="text-danger small" aria-live="polite"></div>
             </div>
 
             <div class="col-12 col-md-6">
                 <label for="tagsInput" class="form-label">Tags</label>
-                <input id="tagsInput" name="tagsInput" type="text" class="form-control" placeholder="ví dụ: ui, ux, brainstorm" aria-describedby="tagsHelp tagsError tagsPreview" />
-                <div id="tagsHelp" class="form-text">Ngăn cách bằng dấu phẩy. Tối đa gợi ý 10 tags.</div>
+                <input id="tagsInput" name="tagsInput" type="text" class="form-control" placeholder="e.g. ui, ux, brainstorm" aria-describedby="tagsHelp tagsError tagsPreview" />
+                <div id="tagsHelp" class="form-text">Separate tags with commas. Up to 10 tags are supported.</div>
                 <div id="tagsError" class="text-danger small" aria-live="polite"></div>
                 <div id="tagsPreview" class="mt-2 d-flex flex-wrap gap-2"></div>
             </div>
 
             <div class="col-12 col-md-6">
-                <label for="files" class="form-label">Tài liệu đính kèm</label>
+                <label for="files" class="form-label">Attachments</label>
                 <input id="files" name="files" type="file" class="form-control" multiple aria-describedby="filesHelp filesError fileList" />
-                <div id="filesHelp" class="form-text">Tối đa 5 file, mỗi file không quá 10MB.</div>
+                <div id="filesHelp" class="form-text">Up to 5 files, each file must be 10MB or smaller.</div>
                 <div id="filesError" class="text-danger small" aria-live="polite"></div>
                 <ul id="fileList" class="list-group list-group-flush mt-2"></ul>
             </div>
@@ -63,12 +63,12 @@
             <div class="col-12 col-md-6">
                 <div class="form-check mb-2">
                     <input id="anonymous" name="anonymous" type="checkbox" class="form-check-input" />
-                    <label for="anonymous" class="form-check-label">Đăng ẩn danh</label>
+                    <label for="anonymous" class="form-check-label">Post anonymously</label>
                 </div>
 
                 <div class="form-check">
                     <input id="agreeTerms" name="agreeTerms" type="checkbox" class="form-check-input" aria-describedby="agreeTermsError" />
-                    <label for="agreeTerms" class="form-check-label">Tôi đồng ý với Điều khoản</label>
+                    <label for="agreeTerms" class="form-check-label">I agree to the Terms</label>
                 </div>
                 <div id="agreeTermsError" class="text-danger small" aria-live="polite"></div>
             </div>
@@ -80,9 +80,9 @@
             </div>
 
             <div class="col-12 d-flex gap-2 flex-wrap">
-                <button id="submitButton" type="submit" class="btn btn-primary">Gửi ý tưởng</button>
-                <button id="resetButton" type="reset" class="btn btn-outline-secondary">Làm mới</button>
-                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <button id="submitButton" type="submit" class="btn btn-primary">Submit Idea</button>
+                <button id="resetButton" type="reset" class="btn btn-outline-secondary">Reset</button>
+                <a asp-action="Index" class="btn btn-secondary">Back</a>
             </div>
         </div>
     </form>

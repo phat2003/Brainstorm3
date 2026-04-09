@@ -8,7 +8,6 @@
             <hr />
         </div>
 
-        @* Hiển thị tất cả lỗi nếu có *@
         <div asp-validation-summary="All" class="text-danger"></div>
 
         <div class="mb-3 row">
@@ -19,20 +18,15 @@
 
         <div class="row">
             <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-primary form-control">Delete this Category</button>
+                <button type="submit" class="btn btn-primary form-control">Delete Category</button>
             </div>
             <div class="col-6 col-md-3">
-                <a asp-controller="Category" asp-action="Index" class="btn btn-secondary border form-control">
-                    Quay Lại
-                </a>
+                <a asp-controller="Category" asp-action="Index" class="btn btn-secondary border form-control">Back</a>
             </div>
         </div>
     </div>
 </form>
 
-@* Script hỗ trợ validate ở phía Client (ngay trên trình duyệt) *@
 @section Scripts {
-    @{
-        <partial name="_ValidationScriptsPartial" />
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

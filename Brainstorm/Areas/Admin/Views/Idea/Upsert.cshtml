@@ -1,7 +1,7 @@
 ﻿@model IdeaVM
 
 @{
-    ViewData["Title"] = Model.idea.Id == 0 ? "Thêm Ý Tưởng" : "Cập Nhật Ý Tưởng";
+    ViewData["Title"] = Model.idea.Id == 0 ? "Create Idea" : "Update Idea";
     var isEdit = Model.idea.Id != 0;
 }
 
@@ -21,38 +21,30 @@
         <div class="mb-3">
             <label asp-for="idea.CategoryId" class="form-label"></label>
             <select asp-for="idea.CategoryId" class="form-select" asp-items="Model.CategoryList">
-                <option value="">-- Chọn Danh Mục --</option>
+                <option value="">-- Select Category --</option>
             </select>
             <span asp-validation-for="idea.CategoryId" class="text-danger"></span>
         </div>
         <div class="mb-3">
             <label asp-for="idea.TopicId" class="form-label"></label>
             <select asp-for="idea.TopicId" class="form-select" asp-items="Model.TopicList">
-                <option value="">-- Chọn Chủ Đề --</option>
+                <option value="">-- Select Topic --</option>
             </select>
             <span asp-validation-for="idea.TopicId" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label class="form-label">Tệp đính kèm (nếu có)</label>
+            <label class="form-label">Attachment (optional)</label>
             <input type="file" name="filepath" class="form-control" />
             @if (!string.IsNullOrEmpty(Model.idea.FilePath))
             {
                 <div class="mt-2">
-                    <span>File hiện tại: </span>
-                    <a href="~/@Model.idea.FilePath" target="_blank">Xem file</a>
+                    <span>Current file: </span>
+                    <a href="~/@Model.idea.FilePath" target="_blank">Open file</a>
                 </div>
             }
         </div>
-        @if (Model.idea.Id ==0)
-        {
-            <button type="submit" class="btn btn-primary">Tạo</button>
-        }
-        else
-        {
-            <button type="submit" class="btn btn-primary">cập nhật</button>
-        }
-        
-        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        <button type="submit" class="btn btn-primary">@(Model.idea.Id == 0 ? "Create" : "Update")</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
     </form>
 </div>
 

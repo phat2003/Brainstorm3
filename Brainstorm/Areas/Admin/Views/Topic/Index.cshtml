@@ -3,11 +3,11 @@
 <div class="container p-3">
     <div class="row pt-4">
         <div class="col-6">
-            <h2 class="text-primary">Danh Sách Chủ Đề (Topic)</h2>
+            <h2 class="text-primary">Topic List</h2>
         </div>
         <div class="col-6 text-end">
             <a asp-controller="Topic" asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Thêm Chủ Đề Mới
+                <i class="bi bi-plus-circle"></i> Add New Topic
             </a>
         </div>
     </div>
@@ -17,10 +17,10 @@
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>Tên Chủ Đề</th>
-                <th>Hạn Nộp Ý Tưởng</th>
-                <th>Hạn Đóng Bình Luận</th>
-                <th>Thao Tác</th>
+                <th>Topic Name</th>
+                <th>Idea Closure Date</th>
+                <th>Final Closure Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -28,16 +28,16 @@
             {
                 <tr>
                     <td>@obj.Name</td>
-                    @* Hiển thị ngày giờ theo định dạng dễ đọc *@
+                    @* Display date and time in a readable format *@
                     <td>@obj.ClosureDate.ToString("dd/MM/yyyy HH:mm")</td>
                     <td>@obj.FinalClosureDate.ToString("dd/MM/yyyy HH:mm")</td>
                     <td>
                         <div class="w-75 btn-group" role="group">
                             <a asp-controller="Topic" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">
-                                <i class="bi bi-pencil-square"></i> Sửa
+                                <i class="bi bi-pencil-square"></i> Edit
                             </a>
                             <a asp-controller="Topic" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash-fill"></i> Xóa
+                                <i class="bi bi-trash-fill"></i> Delete
                             </a>
                         </div>
                     </td>

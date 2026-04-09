@@ -59,8 +59,8 @@
 
         let content = message;
         if (type === 'success' && ideaId) {
-            content += ` <div class="mt-2"><strong>Mã ý tưởng:</strong> ${ideaId}</div>`;
-            content += ` <div class="mt-2"><a class="btn btn-sm btn-outline-success" href="/Staff/Home/Views/${ideaId}">Xem chi tiết</a></div>`;
+            content += ` <div class="mt-2"><strong>Idea ID:</strong> ${ideaId}</div>`;
+            content += ` <div class="mt-2"><a class="btn btn-sm btn-outline-success" href="/Staff/Home/Views/${ideaId}">View details</a></div>`;
         }
 
         elements.formStatus.className = cssClass;
@@ -122,7 +122,7 @@
         elements.tagsPreview.innerHTML = tags.map((tag) => `<span class="badge bg-secondary">${tag}</span>`).join('');
 
         if (allTags.length > 10) {
-            setFieldError('tags', 'Chỉ lấy tối đa 10 tags đầu tiên.');
+            setFieldError('tags', 'Only the first 10 tags will be used.');
         } else {
             setFieldError('tags', '');
         }
@@ -140,7 +140,7 @@
             li.className = 'list-group-item d-flex justify-content-between align-items-center gap-2';
             li.innerHTML = `
                 <span class="text-break">${file.name} <small class="text-muted">(${humanSize(file.size)})</small></span>
-                <button type="button" class="btn btn-sm btn-outline-danger" data-remove-index="${index}" aria-label="Xóa file ${file.name}">Xóa</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" data-remove-index="${index}" aria-label="Remove file ${file.name}">Remove</button>
             `;
             elements.fileList.appendChild(li);
         });
@@ -152,15 +152,15 @@
         const extension = extensionIndex >= 0 ? fileName.substring(extensionIndex).toLowerCase() : '';
 
         if (!allowedExtensions.has(extension)) {
-            return `File ${fileName}: định dạng không hợp lệ (${extension || 'không xác định'}).`;
+            return `File ${fileName}: invalid format (${extension || 'unknown'}).`;
         }
 
         if (file.size > maxFileSize) {
-            return `File ${fileName}: vượt quá 10MB.`;
+            return `File ${fileName}: exceeds 10MB.`;
         }
 
         if (file.type && !allowedMimeTypes.has(file.type)) {
-            return `File ${fileName}: MIME type không hợp lệ (${file.type}).`;
+            return `File ${fileName}: invalid MIME type (${file.type}).`;
         }
 
         return '';
@@ -176,27 +176,27 @@
         const description = (elements.description.value || '').trim();
 
         if (!title) {
-            errors.title = 'Tiêu đề là bắt buộc';
+            errors.title = 'Title is required.';
         } else if (title.length > 150) {
-            errors.title = 'Tối đa 150 ký tự';
+            errors.title = 'Maximum 150 characters.';
         }
 
         if (!description) {
-            errors.description = 'Mô tả là bắt buộc';
+            errors.description = 'Description is required.';
         } else if (description.length > 5000) {
-            errors.description = 'Mô tả tối đa 5000 ký tự';
+            errors.description = 'Description must be 5000 characters or less.';
         }
 
         if (!elements.departmentId.value) {
-            errors.departmentId = 'Vui lòng chọn khoa';
+            errors.departmentId = 'Please select a department.';
         }
 
         if (!elements.agreeTerms.checked) {
-            errors.agreeTerms = 'Bạn phải đồng ý với điều khoản';
+            errors.agreeTerms = 'You must agree to the terms.';
         }
 
         if (selectedFiles.length > maxFiles) {
-            errors.files = `Chỉ được tải tối đa ${maxFiles} file.`;
+            errors.files = `You can upload up to ${maxFiles} files.`;
         } else {
             const fileErrors = selectedFiles.map(getFileError).filter(Boolean);
             if (fileErrors.length > 0) {
@@ -243,7 +243,7 @@
 
             if (departmentsRes.ok) {
                 const departments = await departmentsRes.json();
-                elements.departmentId.innerHTML = '<option value="">-- Chọn khoa --</option>';
+                elements.departmentId.innerHTML = '<option value="">-- Select department --</option>';
                 departments.forEach((d) => {
                     const option = document.createElement('option');
                     option.value = d.id;
@@ -251,7 +251,7 @@
                     elements.departmentId.appendChild(option);
                 });
             } else {
-                elements.departmentId.innerHTML = '<option value="">Không tải được khoa</option>';
+                elements.departmentId.innerHTML = '<option value="">Unable to load departments</option>';
             }
 
             if (categoriesRes.ok) {
@@ -264,11 +264,11 @@
                     elements.categories.appendChild(option);
                 });
             } else {
-                elements.categories.innerHTML = '<option value="">Không tải được danh mục</option>';
+                elements.categories.innerHTML = '<option value="">Unable to load categories</option>';
             }
         } catch {
-            elements.departmentId.innerHTML = '<option value="">Không tải được khoa</option>';
-            elements.categories.innerHTML = '<option value="">Không tải được danh mục</option>';
+            elements.departmentId.innerHTML = '<option value="">Unable to load departments</option>';
+            elements.categories.innerHTML = '<option value="">Unable to load categories</option>';
         }
     }
 
@@ -294,9 +294,9 @@
             if (now > closureDate) {
                 isClosed = true;
                 setUploadingState(false);
-                elements.closureAlert.textContent = 'Đã qua thời hạn nộp ý tưởng. Form đã được khóa.';
+                elements.closureAlert.textContent = 'The idea submission deadline has passed. The form is locked.';
                 elements.closureAlert.classList.remove('d-none');
-                setStatus('error', 'Hệ thống đã đóng nhận ý tưởng mới.');
+                setStatus('error', 'New idea submissions are closed.');
             }
         } catch {
             // ignore config error
@@ -315,7 +315,7 @@
             }
 
             const field = String(item.field).toLowerCase();
-            const message = item.message || 'Dữ liệu không hợp lệ';
+            const message = item.message || 'Invalid data';
 
             if (field === 'title') mapped.title = message;
             else if (field === 'description') mapped.description = message;
@@ -339,12 +339,12 @@
         event.preventDefault();
 
         if (isClosed) {
-            setStatus('error', 'Hệ thống đã đóng nhận ý tưởng mới.');
+            setStatus('error', 'New idea submissions are closed.');
             return;
         }
 
         if (!validateForm()) {
-            setStatus('error', 'Vui lòng kiểm tra lại dữ liệu nhập.');
+            setStatus('error', 'Please review and fix the highlighted errors.');
             return;
         }
 
@@ -366,7 +366,7 @@
         xhr.withCredentials = true;
 
         setUploadingState(true);
-        setStatus('info', 'Đang tải và gửi dữ liệu...');
+        setStatus('info', 'Uploading and submitting data...');
 
         xhr.upload.onprogress = (e) => {
             if (!e.lengthComputable) {
@@ -390,7 +390,7 @@
 
             if (xhr.status === 201) {
                 const ideaId = payload?.id;
-                setStatus('success', 'Gửi ý tưởng thành công.', ideaId);
+                setStatus('success', 'Idea submitted successfully.', ideaId);
                 form.reset();
                 selectedFiles = [];
                 renderFileList();
@@ -400,21 +400,21 @@
 
             if (xhr.status === 400) {
                 const mapped = handleServerErrors(payload);
-                setStatus('error', mapped ? 'Vui lòng sửa các lỗi được đánh dấu.' : 'Dữ liệu không hợp lệ.');
+                setStatus('error', mapped ? 'Please fix the highlighted errors.' : 'Invalid data.');
                 return;
             }
 
             if (xhr.status === 401 || xhr.status === 403) {
-                setStatus('error', 'Bạn không có quyền thực hiện thao tác này. Vui lòng đăng nhập lại.');
+                setStatus('error', 'You are not authorized to perform this action. Please sign in again.');
                 return;
             }
 
-            setStatus('error', 'Có lỗi hệ thống xảy ra. Vui lòng thử lại sau.');
+            setStatus('error', 'A system error occurred. Please try again later.');
         };
 
         xhr.onerror = () => {
             setUploadingState(false);
-            setStatus('error', 'Không thể kết nối tới máy chủ.');
+            setStatus('error', 'Unable to connect to the server.');
         };
 
         xhr.send(formData);
@@ -430,7 +430,7 @@
         const fileErrors = [];
 
         if (merged.length > maxFiles) {
-            fileErrors.push(`Chỉ được tải tối đa ${maxFiles} file.`);
+            fileErrors.push(`You can upload up to ${maxFiles} files.`);
         }
 
         const validFiles = [];
