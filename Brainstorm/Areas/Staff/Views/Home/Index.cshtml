@@ -32,6 +32,15 @@
         <div class="alert alert-danger mt-2">@TempData["Error"]</div>
     }
 
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger mt-3 mb-0">
+                @TempData["Error"]
+            </div>
+        }
+    </section>
+
     <section class="row g-3 mb-4" aria-label="Thống kê ý tưởng">
         <div class="col-12 col-md-4">
             <div class="metric-card metric-day">
