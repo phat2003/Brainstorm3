@@ -2,41 +2,12 @@
 @model IEnumerable<IdeaVM>
 @inject UserManager<IdentityUser> UserManager
 
-<<<<<<< HEAD
 @{
     var ideas = Model?.ToList() ?? new List<IdeaVM>();
     var now = DateTime.Now;
     var todayStart = now.Date;
     var weekStart = now.Date.AddDays(-((int)now.DayOfWeek == 0 ? 6 : (int)now.DayOfWeek - 1));
     var monthStart = new DateTime(now.Year, now.Month, 1);
-=======
-<div class="container py-4" style="max-width: 600px;">
-    <h2 class="mb-4 text-primary">Bảng Tin Ý Tưởng</h2>
-    <a asp-controller="Home" asp-action="Upsert" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Đóng Góp Ý Tưởng
-    </a>
-
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger mt-2">
-            @TempData["Error"]
-        </div>
-    }
-    @foreach (var idea in Model)
-    {
-        <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2">
-                    <img src="https://ui-avatars.com/api/?name=@idea.idea.ApplicationUser.UserName&background=random"
-                         class="rounded-circle me-2" width="40" height="40" alt="avatar" />
-                    <div>
-                        <strong>@idea.idea.ApplicationUser.UserName</strong><br />
-                        <small class="text-muted">@idea.idea.CreatedDate.ToString("dd/MM/yyyy")</small>
-                    </div>
-                </div>
-                <p class="card-text fs-5">@idea.idea.Text</p>
-                <div class="mb-2">
->>>>>>> f175be5d27e14c17ff5a59d4b565c2fbd805d372
 
     var todayCount = ideas.Count(i => i.idea.CreatedDate >= todayStart);
     var weekCount = ideas.Count(i => i.idea.CreatedDate >= weekStart);
@@ -58,9 +29,7 @@
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger mt-2">
-            @TempData["Error"]
-        </div>
+        <div class="alert alert-danger mt-2">@TempData["Error"]</div>
     }
 
     <section class="row g-3 mb-4" aria-label="Thống kê ý tưởng">
@@ -221,34 +190,8 @@
                             </form>
                         </div>
                     </div>
-<<<<<<< HEAD
                 </article>
             }
         }
     </section>
-=======
-
-                    <form asp-action="Views" method="post">
-                        <input type="hidden" name="IdeaId" value="@idea.idea.Id" />
-
-                        <input type="hidden" name="VisitTime" value="1" />
-
-                        <button type="submit" class="btn btn-danger">
-                            Views
-                        </button>
-                        
-                    </form>
-                    
-                    @if (UserManager.GetUserId(User) == idea.idea.ApplicationUserId)//chỉ cho phép người đăng xoá ý tưởng của mình
-                    {
-
-                        <a asp-controller="Home" asp-action="Delete" asp-route-id="@idea.idea.Id" class="btn btn-danger mx-2"> <i class="bi bi-trash-fill">xoá</i></a>
-                        
-                    }
-
-                </div>
-            </div>
-        </div>
-    }
->>>>>>> f175be5d27e14c17ff5a59d4b565c2fbd805d372
 </div>
