@@ -26,21 +26,21 @@
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
             <li>
-                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Tài khoản</a>
+                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">My Account</a>
             </li>
             @if (User.IsInRole(SD.Role_User_Admin))
             {
                 <li>
-                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Tạo user</a>
+                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Create User</a>
                 </li>
                 <li>
-                    <a class="dropdown-item" asp-area="Admin" asp-controller="User" asp-action="Index">Quản lý user</a>
+                    <a class="dropdown-item" asp-area="Admin" asp-controller="User" asp-action="Index">Manage Users</a>
                 </li>
             }
             <li><hr class="dropdown-divider" /></li>
             <li>
                 <form id="logoutForm" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "Staff" })">
-                    <button id="logout" type="submit" class="dropdown-item">Đăng xuất</button>
+                    <button id="logout" type="submit" class="dropdown-item">Logout</button>
                 </form>
             </li>
         </ul>

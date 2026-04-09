@@ -38,17 +38,17 @@ namespace Brainstorm.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Display(Name = "Họ và tên")]
+            [Display(Name = "Full name")]
             [StringLength(100)]
             public string FullName { get; set; }
 
-            [Display(Name = "Ảnh đại diện (URL)")]
-            [Url(ErrorMessage = "Avatar phải là URL hợp lệ")]
+            [Display(Name = "Avatar URL")]
+            [Url(ErrorMessage = "Avatar must be a valid URL")]
             [StringLength(500)]
             public string AvatarUrl { get; set; }
 
             [Phone]
-            [Display(Name = "Số điện thoại")]
+            [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
         }
 
@@ -100,7 +100,7 @@ namespace Brainstorm.Areas.Identity.Pages.Account.Manage
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    StatusMessage = "Có lỗi khi cập nhật số điện thoại.";
+                    StatusMessage = "Unexpected error while updating phone number.";
                     return RedirectToPage();
                 }
             }
@@ -142,7 +142,7 @@ namespace Brainstorm.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Đã cập nhật hồ sơ thành công";
+            StatusMessage = "Your profile has been updated successfully.";
             return RedirectToPage();
         }
     }

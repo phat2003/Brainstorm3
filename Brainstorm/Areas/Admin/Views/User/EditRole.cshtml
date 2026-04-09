@@ -3,7 +3,7 @@
 <div class="container p-3">
     <div class="row pt-4">
         <div class="col-6">
-            <h2 class="text-primary">Cập nhật User (Role + Department)</h2>
+            <h2 class="text-primary">Update User (Role + Department)</h2>
         </div>
     </div>
     <br />
@@ -13,26 +13,26 @@
         <input type="hidden" asp-for="User.Id" name="userId" />
 
         <div class="mb-3">
-            <label class="form-label">Tên đăng nhập (UserName)</label>
+            <label class="form-label">Username</label>
             <input asp-for="User.UserName" class="form-control" readonly />
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Chọn Vai trò mới</label>
+            <label class="form-label">Select New Role</label>
             <select name="newRole" asp-items="@Model.RoleList" class="form-select" id="newRoleSelect">
-                <option disabled>-- Chọn Vai trò --</option>
+                <option disabled>-- Select Role --</option>
             </select>
         </div>
 
         <div class="mb-3 d-none" id="departmentWrapper">
             <label class="form-label">Department</label>
             <select name="departmentId" asp-items="@Model.DepartmentList" class="form-select" id="departmentSelect">
-                <option value="">-- Chọn Department --</option>
+                <option value="">-- Select Department --</option>
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Cập nhật</button>
-        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to list</a>
     </form>
 </div>
 

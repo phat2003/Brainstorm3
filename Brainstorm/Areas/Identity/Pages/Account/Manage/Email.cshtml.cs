@@ -88,13 +88,13 @@ namespace Brainstorm.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync()
         {
-            StatusMessage = "Email không cho phép thay đổi.";
+            StatusMessage = "Email cannot be changed.";
             return RedirectToPage("./Index");
         }
 
         public async Task<IActionResult> OnPostChangeEmailAsync()
         {
-            StatusMessage = "Email không cho phép thay đổi.";
+            StatusMessage = "Email cannot be changed.";
             return RedirectToPage("./Index");
         }
 

@@ -138,7 +138,7 @@ namespace Brainstorm.Areas.Staff.Controllers
                 }
 
                 _unitOfWork.Save();
-                TempData["Sucess"] = "Product create sucessfully";
+                TempData["Sucess"] = "Idea saved successfully.";
                 return RedirectToAction("index");
             }
 
@@ -218,7 +218,7 @@ namespace Brainstorm.Areas.Staff.Controllers
             _unitOfWork.Save();
 
             // Thông báo thành công và chuyển hướng về trang danh sách
-            TempData["success"] = "Đã xóa Idea thành công!";
+            TempData["success"] = "Idea deleted successfully!";
             return RedirectToAction("Index");
         }
 
@@ -263,7 +263,7 @@ namespace Brainstorm.Areas.Staff.Controllers
             }
             else
             {
-                TempData["Error"] = "Bạn cần đăng nhập để xem chi tiết ý tưởng!";
+                TempData["Error"] = "You must sign in to view idea details.";
                 return RedirectToAction(nameof(Index));
             }
             View viewObj = _unitOfWork.View.GetFirstOrDefault(u => u.ApplicationUserId == claim.Value && u.IdeaId == view.IdeaId);//kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng của người dùng chưa
