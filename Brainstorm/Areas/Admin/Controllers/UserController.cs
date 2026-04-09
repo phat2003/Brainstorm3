@@ -1,9 +1,12 @@
-﻿using Brainstorm.Models;
-using Brainstorm.Models.ViewModel; // Thêm dòng này để dùng UserRoleVM
+﻿using Brainstorm.DataAccess.Data;
+using Brainstorm.Models;
+using Brainstorm.Models.ViewModel;
+using Brainstorm.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,155 +14,288 @@ using System.Threading.Tasks;
 namespace Brainstorm.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = SD.Role_User_Admin)]
     public class UserController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _db;
 
-        public UserController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UserController(
+            UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext db)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _db = db;
         }
 
         public async Task<IActionResult> Index()
         {
-            // 1. Lấy danh sách tất cả người dùng
-            var users = _userManager.Users.ToList();
+            var users = await _userManager.Users.ToListAsync();
+            var appUsers = await _db.ApplicationUsers
+                .Include(u => u.Department)
+                .ToListAsync();
+            var appUserMap = appUsers.ToDictionary(u => u.Id, u => u);
 
-            // 2. Tạo một danh sách rỗng để chứa dữ liệu hiển thị (ViewModel)
             var userRoleVMs = new List<UserRoleVM>();
 
-            // 3. Duyệt qua từng người dùng để lấy thêm Role
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Contains(SD.Role_User_Admin))
+                {
+                    continue;
+                }
+
+                string departmentName = "-";
+                if (appUserMap.TryGetValue(user.Id, out var appUser))
+                {
+                    departmentName = appUser.Department?.Name ?? "-";
+                }
 
                 userRoleVMs.Add(new UserRoleVM
                 {
                     UserId = user.Id,
                     UserName = user.UserName,
-                    // Một người có thể có nhiều role, ta ghép chúng lại bằng dấu phẩy
-                    Role = string.Join(", ", roles)
+                    Role = string.Join(", ", roles),
+                    DepartmentName = departmentName
                 });
             }
 
-            // 4. Trả danh sách này về cho View
             return View(userRoleVMs);
         }
 
         [HttpGet]
         public async Task<IActionResult> EditRole(string userId)
         {
-            // 1. Tìm người dùng
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
             }
 
-            // 2. Lấy Role hiện tại (Giả sử dự án của bạn mỗi người chỉ có 1 Role tại một thời điểm)
+            var appUser = await _db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (await IsAdminUser(user))
+            {
+                TempData["error"] = "Không thể phân quyền cho tài khoản Admin.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var oldRoles = await _userManager.GetRolesAsync(user);
             var oldRole = oldRoles.FirstOrDefault();
 
-            // 3. Lấy tất cả Roles trong hệ thống và chuyển đổi thành dạng danh sách thả xuống (SelectListItem)
-            var roles = _roleManager.Roles.ToList();
-            var roleList = roles.Select(x => new SelectListItem
-            {
-                Text = x.Name, // Chữ hiển thị cho Admin thấy (VD: "Staff")
-                Value = x.Name // Giá trị thực sự gửi về Server
-            });
+            var roleList = _roleManager.Roles
+                .Select(x => x.Name)
+                .Where(r => r != SD.Role_User_Admin)
+                .Select(r => new SelectListItem
+                {
+                    Text = r,
+                    Value = r,
+                    Selected = r == oldRole
+                });
 
-            // 4. Đóng gói tất cả vào ViewModel
+            var departmentList = _db.Departments
+                .Select(d => new SelectListItem
+                {
+                    Text = d.Name,
+                    Value = d.Id.ToString(),
+                    Selected = appUser != null && appUser.DepartmentId == d.Id
+                })
+                .ToList();
+
             var roleVM = new RoleManagementVM
             {
                 User = user,
                 OldRole = oldRole,
-                RoleList = roleList
+                DepartmentId = appUser?.DepartmentId,
+                RoleList = roleList,
+                DepartmentList = departmentList
             };
 
-            // 5. Gửi ra View
             return View(roleVM);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditRole(string userId, string newRole)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditRole(string userId, string newRole, int? departmentId)
         {
-            // Kiểm tra xem dữ liệu gửi lên có bị trống không
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(newRole))
             {
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
 
-            // 1. Tìm người dùng trong cơ sở dữ liệu
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
             }
 
-            // 2. Lấy danh sách các Vai trò (Role) cũ của người dùng này và xóa chúng đi
+            var appUser = await _db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (await IsAdminUser(user) || newRole == SD.Role_User_Admin)
+            {
+                TempData["error"] = "Không thể thay đổi role Admin.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (newRole != SD.Role_User_Admin)
+            {
+                if (!departmentId.HasValue || !await _db.Departments.AnyAsync(d => d.Id == departmentId.Value))
+                {
+                    TempData["error"] = "Vui lòng chọn Department hợp lệ.";
+                    return RedirectToAction(nameof(EditRole), new { userId });
+                }
+
+                if (appUser != null)
+                {
+                    appUser.DepartmentId = departmentId;
+                    _db.ApplicationUsers.Update(appUser);
+                    await _db.SaveChangesAsync();
+                }
+                else
+                {
+                    TempData["error"] = "Không thể cập nhật Department cho user cũ (legacy user). Bạn có thể tạo lại user để gán Department.";
+                    return RedirectToAction(nameof(EditRole), new { userId });
+                }
+            }
+            else if (appUser != null)
+            {
+                appUser.DepartmentId = null;
+                _db.ApplicationUsers.Update(appUser);
+                await _db.SaveChangesAsync();
+            }
+
             var oldRoles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, oldRoles);
-
-            // 3. Cấp Vai trò mới mà Admin vừa chọn
             await _userManager.AddToRoleAsync(user, newRole);
 
-            // 4. Quay trở về trang danh sách
-            return RedirectToAction("Index");
+            TempData["success"] = $"Đã cập nhật role và department cho {user.UserName}";
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
         public async Task<IActionResult> Delete(string userId)
         {
-            // 1. Tìm người dùng
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
             }
 
-            // 2. Lấy Role hiện tại (Giả sử dự án của bạn mỗi người chỉ có 1 Role tại một thời điểm)
+            if (await IsAdminUser(user))
+            {
+                TempData["error"] = "Không thể xóa tài khoản Admin.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var oldRoles = await _userManager.GetRolesAsync(user);
             var oldRole = oldRoles.FirstOrDefault();
 
-            // 3. Lấy tất cả Roles trong hệ thống và chuyển đổi thành dạng danh sách thả xuống (SelectListItem)
-            var roles = _roleManager.Roles.ToList();
-            var roleList = roles.Select(x => new SelectListItem
-            {
-                Text = x.Name, // Chữ hiển thị cho Admin thấy (VD: "Staff")
-                Value = x.Name // Giá trị thực sự gửi về Server
-            });
-
-            // 4. Đóng gói tất cả vào ViewModel
             var roleVM = new RoleManagementVM
             {
                 User = user,
                 OldRole = oldRole,
-                RoleList = roleList
+                RoleList = Enumerable.Empty<SelectListItem>()
             };
 
-            // 5. Gửi ra View
             return View(roleVM);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePost(string userId)
         {
             if (string.IsNullOrEmpty(userId))
             {
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
             }
+
+            if (await IsAdminUser(user))
+            {
+                TempData["error"] = "Không thể xóa tài khoản Admin.";
+                return RedirectToAction(nameof(Index));
+            }
+
             await _userManager.DeleteAsync(user);
-            return RedirectToAction("Index");
-            return View();
+            TempData["success"] = $"Đã xóa user {user.UserName}";
+            return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (await IsAdminUser(user))
+            {
+                TempData["error"] = "Không thể reset mật khẩu tài khoản Admin.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var vm = new AdminResetPasswordVM
+            {
+                UserId = user.Id,
+                UserName = user.UserName
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(AdminResetPasswordVM vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+
+            var user = await _userManager.FindByIdAsync(vm.UserId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (await IsAdminUser(user))
+            {
+                TempData["error"] = "Không thể reset mật khẩu tài khoản Admin.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, vm.NewPassword);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                vm.UserName = user.UserName;
+                return View(vm);
+            }
+
+            TempData["success"] = $"Đã reset mật khẩu cho user {user.UserName}";
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<bool> IsAdminUser(IdentityUser user)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles.Contains(SD.Role_User_Admin);
+        }
     }
 }

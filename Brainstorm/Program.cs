@@ -17,7 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true; // Bắt buộc người dùng phải xác thực account
+    options.SignIn.RequireConfirmedAccount = false;
 })
 .AddDefaultTokenProviders()
 .AddEntityFrameworkStores<ApplicationDbContext>();

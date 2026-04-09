@@ -12,5 +12,8 @@ namespace Brainstorm.Utility
         public const string Role_User_User = "User";
         public const string Role_User_Qam = "Qam";
         public const string Role_User_Qac = "Qac";
+
+        public const string Claim_FullName = "brainstorm_full_name";
+        public const string Claim_AvatarUrl = "brainstorm_avatar_url";
     }
 }

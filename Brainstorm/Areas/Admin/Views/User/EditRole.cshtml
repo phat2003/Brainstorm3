@@ -3,12 +3,13 @@
 <div class="container p-3">
     <div class="row pt-4">
         <div class="col-6">
-            <h2 class="text-primary">Phân quyền Người dùng</h2>
+            <h2 class="text-primary">Cập nhật User (Role + Department)</h2>
         </div>
     </div>
     <br />
 
     <form method="post" action="EditRole">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="User.Id" name="userId" />
 
         <div class="mb-3">
@@ -18,8 +19,15 @@
 
         <div class="mb-3">
             <label class="form-label">Chọn Vai trò mới</label>
-            <select name="newRole" asp-items="@Model.RoleList" class="form-select">
-                <option disabled selected>-- Chọn Vai trò --</option>
+            <select name="newRole" asp-items="@Model.RoleList" class="form-select" id="newRoleSelect">
+                <option disabled>-- Chọn Vai trò --</option>
+            </select>
+        </div>
+
+        <div class="mb-3 d-none" id="departmentWrapper">
+            <label class="form-label">Department</label>
+            <select name="departmentId" asp-items="@Model.DepartmentList" class="form-select" id="departmentSelect">
+                <option value="">-- Chọn Department --</option>
             </select>
         </div>
 
@@ -27,3 +35,27 @@
         <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const roleSelect = document.getElementById('newRoleSelect');
+            const departmentWrapper = document.getElementById('departmentWrapper');
+            const departmentSelect = document.getElementById('departmentSelect');
+            if (!roleSelect || !departmentWrapper || !departmentSelect) return;
+
+            const sync = () => {
+                const selectedRole = roleSelect.value;
+                if (selectedRole === 'Admin') {
+                    departmentWrapper.classList.add('d-none');
+                    departmentSelect.value = '';
+                } else {
+                    departmentWrapper.classList.remove('d-none');
+                }
+            };
+
+            roleSelect.addEventListener('change', sync);
+            sync();
+        })();
+    </script>
+}
