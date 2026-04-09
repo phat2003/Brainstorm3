@@ -150,6 +150,11 @@ namespace Brainstorm.Areas.Identity.Pages.Account
                 return RedirectToPage("/Account/Login", new { area = "Identity" });
             }
 
+            if (hasAdmin && Input.Role == SD.Role_User_Admin)
+            {
+                ModelState.AddModelError("Input.Role", "Admin role cannot be assigned from this page.");
+            }
+
             if (!hasAdmin)
             {
                 Input.Role = SD.Role_User_Admin;
@@ -239,6 +244,10 @@ namespace Brainstorm.Areas.Identity.Pages.Account
             if (!hasAdmin)
             {
                 availableRoles = availableRoles.Where(r => r == SD.Role_User_Admin);
+            }
+            else
+            {
+                availableRoles = availableRoles.Where(r => r != SD.Role_User_Admin);
             }
 
             return new InputModel
