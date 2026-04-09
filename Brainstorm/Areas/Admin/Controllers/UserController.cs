@@ -80,7 +80,7 @@ namespace Brainstorm.Areas.Admin.Controllers
 
             if (await IsAdminUser(user))
             {
-                TempData["error"] = "Không thể phân quyền cho tài khoản Admin.";
+                TempData["error"] = "Admin accounts cannot be modified here.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -137,7 +137,7 @@ namespace Brainstorm.Areas.Admin.Controllers
 
             if (await IsAdminUser(user) || newRole == SD.Role_User_Admin)
             {
-                TempData["error"] = "Không thể thay đổi role Admin.";
+                TempData["error"] = "Admin role cannot be changed.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -145,7 +145,7 @@ namespace Brainstorm.Areas.Admin.Controllers
             {
                 if (!departmentId.HasValue || !await _db.Departments.AnyAsync(d => d.Id == departmentId.Value))
                 {
-                    TempData["error"] = "Vui lòng chọn Department hợp lệ.";
+                    TempData["error"] = "Please select a valid department.";
                     return RedirectToAction(nameof(EditRole), new { userId });
                 }
 
@@ -157,7 +157,7 @@ namespace Brainstorm.Areas.Admin.Controllers
                 }
                 else
                 {
-                    TempData["error"] = "Không thể cập nhật Department cho user cũ (legacy user). Bạn có thể tạo lại user để gán Department.";
+                    TempData["error"] = "Cannot update department for legacy users. Re-create the user to assign a department.";
                     return RedirectToAction(nameof(EditRole), new { userId });
                 }
             }
@@ -172,7 +172,7 @@ namespace Brainstorm.Areas.Admin.Controllers
             await _userManager.RemoveFromRolesAsync(user, oldRoles);
             await _userManager.AddToRoleAsync(user, newRole);
 
-            TempData["success"] = $"Đã cập nhật role và department cho {user.UserName}";
+            TempData["success"] = $"Updated role and department for {user.UserName}.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -187,7 +187,7 @@ namespace Brainstorm.Areas.Admin.Controllers
 
             if (await IsAdminUser(user))
             {
-                TempData["error"] = "Không thể xóa tài khoản Admin.";
+                TempData["error"] = "Admin accounts cannot be deleted.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -221,12 +221,12 @@ namespace Brainstorm.Areas.Admin.Controllers
 
             if (await IsAdminUser(user))
             {
-                TempData["error"] = "Không thể xóa tài khoản Admin.";
+                TempData["error"] = "Admin accounts cannot be deleted.";
                 return RedirectToAction(nameof(Index));
             }
 
             await _userManager.DeleteAsync(user);
-            TempData["success"] = $"Đã xóa user {user.UserName}";
+            TempData["success"] = $"Deleted user {user.UserName}.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -241,7 +241,7 @@ namespace Brainstorm.Areas.Admin.Controllers
 
             if (await IsAdminUser(user))
             {
-                TempData["error"] = "Không thể reset mật khẩu tài khoản Admin.";
+                TempData["error"] = "Admin passwords cannot be reset from this screen.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -271,7 +271,7 @@ namespace Brainstorm.Areas.Admin.Controllers
 
             if (await IsAdminUser(user))
             {
-                TempData["error"] = "Không thể reset mật khẩu tài khoản Admin.";
+                TempData["error"] = "Admin passwords cannot be reset from this screen.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -288,7 +288,7 @@ namespace Brainstorm.Areas.Admin.Controllers
                 return View(vm);
             }
 
-            TempData["success"] = $"Đã reset mật khẩu cho user {user.UserName}";
+            TempData["success"] = $"Password reset successfully for {user.UserName}.";
             return RedirectToAction(nameof(Index));
         }
 

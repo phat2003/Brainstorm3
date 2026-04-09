@@ -128,7 +128,7 @@ namespace Brainstorm.Areas.Identity.Pages.Account
                 }
                 if (result.IsNotAllowed)
                 {
-                    ModelState.AddModelError(string.Empty, "Tài khoản chưa được phép đăng nhập. Vui lòng liên hệ quản trị viên.");
+                    ModelState.AddModelError(string.Empty, "This account is not allowed to sign in. Please contact an administrator.");
                     return Page();
                 }
                 else

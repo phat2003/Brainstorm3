@@ -1,50 +1,50 @@
 ﻿@model Idea
 
 @{
-    ViewData["Title"] = "Chi tiết ý tưởng";
+    ViewData["Title"] = "Idea Details";
 }
 
 <div class="detail-modern-page">
     <div class="detail-header mb-3">
         <h2 class="mb-1">@ViewData["Title"]</h2>
-        <p class="text-muted mb-0">Thông tin chi tiết của ý tưởng được hiển thị trực quan.</p>
+        <p class="text-muted mb-0">Detailed information about this idea is shown clearly.</p>
     </div>
 
     <article class="detail-card">
         <div class="row g-3">
             <div class="col-12">
-                <div class="detail-label">Nội dung</div>
+                <div class="detail-label">Content</div>
                 <div class="detail-value">@Model.Text</div>
             </div>
 
             <div class="col-12 col-md-6">
-                <div class="detail-label">Danh mục</div>
+                <div class="detail-label">Category</div>
                 <div class="detail-value">@Model.Category?.Name</div>
             </div>
 
             <div class="col-12 col-md-6">
-                <div class="detail-label">Chủ đề</div>
+                <div class="detail-label">Topic</div>
                 <div class="detail-value">@Model.Topic?.Name</div>
             </div>
 
             <div class="col-12 col-md-6">
-                <div class="detail-label">Ngày tạo</div>
+                <div class="detail-label">Created At</div>
                 <div class="detail-value">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
             </div>
 
             @if (!string.IsNullOrEmpty(Model.FilePath))
             {
                 <div class="col-12 col-md-6">
-                    <div class="detail-label">Tệp đính kèm</div>
+                    <div class="detail-label">Attachment</div>
                     <div class="detail-value">
-                        <a href="~/@Model.FilePath" target="_blank" class="btn btn-outline-primary btn-sm">Xem file</a>
+                        <a href="~/@Model.FilePath" target="_blank" class="btn btn-outline-primary btn-sm">Open file</a>
                     </div>
                 </div>
             }
         </div>
 
         <div class="mt-4 d-flex gap-2 flex-wrap">
-            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+            <a asp-action="Index" class="btn btn-secondary">Back</a>
         </div>
     </article>
 </div>

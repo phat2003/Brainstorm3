@@ -19,11 +19,11 @@
             <div class="form-floating mb-3">
                 <input asp-for="Username" class="form-control" disabled />
                 <label asp-for="Username" class="form-label"></label>
-                <div class="form-text">Email/username không được thay đổi.</div>
+                <div class="form-text">Email/username cannot be changed.</div>
             </div>
 
             <div class="form-floating mb-3">
-                <input asp-for="Input.FullName" class="form-control" placeholder="Nhập họ tên" />
+                <input asp-for="Input.FullName" class="form-control" placeholder="Enter full name" />
                 <label asp-for="Input.FullName" class="form-label"></label>
                 <span asp-validation-for="Input.FullName" class="text-danger"></span>
             </div>
@@ -35,7 +35,7 @@
             </div>
 
             <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Enter phone number" />
                 <label asp-for="Input.PhoneNumber" class="form-label"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
