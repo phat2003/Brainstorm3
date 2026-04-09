@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loader = document.createElement('div');
     loader.id = 'ideaInfiniteLoader';
-    loader.textContent = 'Đang tải thêm bài viết...';
+    loader.textContent = 'Loading more posts...';
 
     const sentinel = document.createElement('div');
     sentinel.id = 'ideaInfiniteSentinel';
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         visibleCount = nextCount;
 
         if (visibleCount >= items.length) {
-            loader.textContent = 'Đã hiển thị tất cả bài viết';
+            loader.textContent = 'All posts are displayed';
             observer.disconnect();
             sentinel.remove();
         }

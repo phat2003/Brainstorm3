@@ -56,18 +56,14 @@ namespace Brainstorm.Areas.Admin.Controllers
 
         //post
         [HttpPost]
-        [ValidateAntiForgeryToken]//lệnh này dùng để chống giả mạo về method này
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Category obj)
         {
-            //if (obj.Name == obj.DisplayOrder.ToString())
-            //{
-            //    ModelState.AddModelError("name", "The Name must not same displayorder");
-            //}
             if (ModelState.IsValid)
             {
                 _unitOfWork.Category.Update(obj);
                 _unitOfWork.Save();
-                TempData["Sucess"] = "Category Edit sucessfully";
+                TempData["success"] = "Category updated successfully.";
                 return RedirectToAction("index");
             }
             return View(obj);
@@ -104,7 +100,7 @@ namespace Brainstorm.Areas.Admin.Controllers
             {
                 _unitOfWork.Category.Remove(obj);
                 _unitOfWork.Save();
-                TempData["Sucess"] = "Category Delete sucessfully";
+                TempData["success"] = "Category deleted successfully.";
                 return RedirectToAction("index");
             }
             return View(obj);

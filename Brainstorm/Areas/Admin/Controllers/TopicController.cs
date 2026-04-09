@@ -35,13 +35,14 @@ namespace Brainstorm.Areas.Admin.Controllers
         {
             if (obj.ClosureDate > obj.FinalClosureDate)
             {
-                ModelState.AddModelError("FinalClosureDate", "Hạn đóng bình luận không được sớm hơn Hạn nộp ý tưởng.");
+                ModelState.AddModelError("FinalClosureDate", "Final closure date cannot be earlier than idea closure date.");
             }
             // Kiểm tra tính hợp lệ của dữ liệu
             if (ModelState.IsValid)
             {
                 _unitOfWork.Topic.Add(obj); // Thêm vào danh sách chờ
                 _unitOfWork.Save();   // Lưu vào SQL Server
+                TempData["success"] = "Topic created successfully.";
                 return RedirectToAction("Index"); // Quay về trang danh sách
             }
             return View(obj); // Nếu lỗi (ví dụ chưa nhập ngày), hiện lại form
@@ -76,7 +77,7 @@ namespace Brainstorm.Areas.Admin.Controllers
             {
                 _unitOfWork.Topic.Update(obj);
                 _unitOfWork.Save();
-                TempData["Sucess"] = "Category Edit sucessfully";
+                TempData["success"] = "Topic updated successfully.";
                 return RedirectToAction("index");
             }
             return View(obj);
@@ -113,7 +114,7 @@ namespace Brainstorm.Areas.Admin.Controllers
             {
                 _unitOfWork.Topic.Remove(obj);
                 _unitOfWork.Save();
-                TempData["Sucess"] = "Category Delete sucessfully";
+                TempData["success"] = "Topic deleted successfully.";
                 return RedirectToAction("index");
             }
             return View(obj);

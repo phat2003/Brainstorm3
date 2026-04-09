@@ -102,7 +102,7 @@ namespace Brainstorm.Areas.Admin.Controllers
                 }
 
                 _unitOfWork.Save();
-                TempData["Sucess"] = "Product create sucessfully";
+                TempData["success"] = "Idea saved successfully.";
                 return RedirectToAction("index");
             }
 
@@ -208,7 +208,7 @@ namespace Brainstorm.Areas.Admin.Controllers
             _unitOfWork.Save();
 
             // Thông báo thành công và chuyển hướng về trang danh sách
-            TempData["success"] = "Đã xóa Idea thành công!";
+            TempData["success"] = "Idea deleted successfully.";
             return RedirectToAction("Index");
         }
     }
