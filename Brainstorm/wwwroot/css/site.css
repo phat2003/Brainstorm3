@@ -1,5 +1,6 @@
 html {
   font-size: 14px;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -17,24 +18,40 @@ html {
   box-shadow: 0 0 0 0.12rem #fff, 0 0 0 0.28rem rgba(111, 66, 193, 0.35);
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-  margin-bottom: 60px;
+  margin: 0;
+  overflow-x: hidden;
   background: radial-gradient(circle at top right, #f1e8ff 0%, #f6f8ff 38%, #eefaf8 100%);
   color: #212529;
+}
+
+body.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell > .container {
+  flex: 1 0 auto;
 }
 
 .app-shell .container {
   max-width: 1160px;
 }
 
+.footer {
+  margin-top: auto;
+  background: rgba(255, 255, 255, 0.85);
+}
+
 .navbar-modern {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.navbar-modern:hover {
+  box-shadow: 0 8px 20px rgba(18, 38, 63, 0.08);
 }
 
 .brand-modern {
@@ -61,6 +78,28 @@ body {
 .navbar-modern .nav-link:hover {
   background: #efe7ff;
   color: #5f33b5;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 2px solid rgba(111, 66, 193, 0.2);
+  box-shadow: 0 6px 16px rgba(18, 38, 63, 0.15);
+  object-fit: cover;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-avatar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(18, 38, 63, 0.18);
+}
+
+.user-menu .dropdown-menu {
+  min-width: 200px;
+  margin-top: 0.6rem;
+  border: 1px solid rgba(111, 66, 193, 0.15);
+  box-shadow: 0 16px 36px rgba(18, 38, 63, 0.12);
 }
 
 .home-modern-page {
@@ -122,12 +161,24 @@ body {
   border: 1px solid rgba(111, 66, 193, 0.12);
   border-radius: 1rem;
   box-shadow: 0 12px 30px rgba(18, 38, 63, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.idea-card-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(18, 38, 63, 0.12);
 }
 
 .idea-content {
   font-size: 1rem;
   line-height: 1.55;
   color: #2b2f35;
+}
+
+#ideaInfiniteLoader {
+  color: #6c757d;
+  text-align: center;
+  padding: 0.5rem 0 1rem;
 }
 
 .comment-list {
@@ -215,6 +266,23 @@ body {
   font-size: 1rem;
   color: #212529;
   line-height: 1.5;
+}
+
+.profile-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(111, 66, 193, 0.14);
+  border-radius: 1rem;
+  padding: 1.1rem;
+  box-shadow: 0 12px 28px rgba(18, 38, 63, 0.08);
+}
+
+.profile-avatar-preview {
+  width: 84px;
+  height: 84px;
+  border-radius: 999px;
+  border: 3px solid rgba(111, 66, 193, 0.22);
+  object-fit: cover;
+  box-shadow: 0 10px 24px rgba(18, 38, 63, 0.15);
 }
 
 @media (max-width: 767.98px) {

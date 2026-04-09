@@ -25,6 +25,13 @@
                 Đóng góp ý tưởng mới
             </a>
         </div>
+    </section>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mt-2">@TempData["Error"]</div>
+    }
+
 
         @if (TempData["Error"] != null)
         {
@@ -138,7 +145,7 @@
 
                             @if (UserManager.GetUserId(User) == idea.idea.ApplicationUserId)
                             {
-                                <a asp-controller="Home" asp-action="Delete" asp-route-id="@idea.idea.Id" class="btn btn-outline-danger btn-sm">Xóa ý tưởng</a>
+                                <a asp-controller="Home" asp-action="Delete" asp-route-id="@idea.idea.Id" class="btn btn-outline-danger btn-sm">Xóa</a>
                             }
                         </div>
 

@@ -127,34 +127,35 @@ namespace Brainstorm.Areas.Identity.Pages.Account
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Qam)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Qac)).GetAwaiter().GetResult();
             }
-            // 1. Lấy danh sách những người đang có quyền Admin
-            //var adminUsers = _userManager.GetUsersInRoleAsync(SD.Role_User_Admin).GetAwaiter().GetResult();
 
-            // 2. Nếu danh sách có người (Count > 0), gán IsAdminExists = true. Ngược lại là false.
-            //IsAdminExists = adminUsers.Count > 0;
+            if (await HasAdminUserAsync() && !User.IsInRole(SD.Role_User_Admin))
+            {
+                Response.Redirect(Url.Page("/Account/Login", values: new { area = "Identity" }));
+                return;
+            }
+
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            Input = new InputModel()
-            {
-                RoleList = _roleManager.Roles.Select(x => x.Name).Select(
-                i => new SelectListItem
-                {
-                    Text = i,
-                    Value = i
-                }),
-                DepartmentList = _unitOfWork.Department.GetAll().Select(i => new SelectListItem
-                {
-                    Text = i.Name,
-                    Value = i.Id.ToString()
-
-                })
-            };
+            Input = await BuildRegisterInputAsync();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            var hasAdmin = await HasAdminUserAsync();
+            if (hasAdmin && !User.IsInRole(SD.Role_User_Admin))
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
+            if (!hasAdmin)
+            {
+                Input.Role = SD.Role_User_Admin;
+                Input.DepartmentId = 0;
+            }
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -162,10 +163,6 @@ namespace Brainstorm.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 user.DepartmentId = Input.DepartmentId;
-                //if (Input.Role == SD.Role_User_Admin)
-                //{
-                //    user.DepartmentId = Input.DepartmentId;
-                //}
 
                 if (Input.Role == SD.Role_User_Admin)
                 {
@@ -177,16 +174,14 @@ namespace Brainstorm.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-                    if (Input.Role == null)//nếu không chọn role trong trang đăng ký thì set default role
+                    if (Input.Role == null)
                     {
-                        await _userManager.AddToRoleAsync(user, SD.Role_User_User);//default role
+                        await _userManager.AddToRoleAsync(user, SD.Role_User_User);
                     }
-                    else//có chọn role trong trang đăng ký thì set role tương ứng
+                    else
                     {
-                        await _userManager.AddToRoleAsync(user, Input.Role);//custom role
+                        await _userManager.AddToRoleAsync(user, Input.Role);
                     }
-
-                    
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -197,8 +192,15 @@ namespace Brainstorm.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    try
+                    {
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Cannot send confirmation email for user {Email}", Input.Email);
+                    }
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -216,8 +218,43 @@ namespace Brainstorm.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
+            var data = await BuildRegisterInputAsync();
+            Input.RoleList = data.RoleList;
+            Input.DepartmentList = data.DepartmentList;
+
             return Page();
+        }
+
+        private async Task<bool> HasAdminUserAsync()
+        {
+            var adminUsers = await _userManager.GetUsersInRoleAsync(SD.Role_User_Admin);
+            return adminUsers.Any();
+        }
+
+        private async Task<InputModel> BuildRegisterInputAsync()
+        {
+            var hasAdmin = await HasAdminUserAsync();
+            var availableRoles = _roleManager.Roles.Select(x => x.Name).AsEnumerable();
+
+            if (!hasAdmin)
+            {
+                availableRoles = availableRoles.Where(r => r == SD.Role_User_Admin);
+            }
+
+            return new InputModel
+            {
+                Role = hasAdmin ? null : SD.Role_User_Admin,
+                RoleList = availableRoles.Select(i => new SelectListItem
+                {
+                    Text = i,
+                    Value = i
+                }),
+                DepartmentList = _unitOfWork.Department.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                })
+            };
         }
 
         private ApplicationUser CreateUser()

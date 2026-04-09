@@ -2,13 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using Brainstorm.Utility;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 
 namespace Brainstorm.Areas.Identity.Pages.Account.Manage
 {
@@ -25,38 +28,27 @@ namespace Brainstorm.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            [Display(Name = "Họ và tên")]
+            [StringLength(100)]
+            public string FullName { get; set; }
+
+            [Display(Name = "Ảnh đại diện (URL)")]
+            [Url(ErrorMessage = "Avatar phải là URL hợp lệ")]
+            [StringLength(500)]
+            public string AvatarUrl { get; set; }
+
             [Phone]
-            [Display(Name = "Phone number")]
+            [Display(Name = "Số điện thoại")]
             public string PhoneNumber { get; set; }
         }
 
@@ -64,12 +56,15 @@ namespace Brainstorm.Areas.Identity.Pages.Account.Manage
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            var claims = await _userManager.GetClaimsAsync(user);
 
             Username = userName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                FullName = claims.FirstOrDefault(c => c.Type == SD.Claim_FullName)?.Value,
+                AvatarUrl = claims.FirstOrDefault(c => c.Type == SD.Claim_AvatarUrl)?.Value
             };
         }
 
@@ -105,13 +100,49 @@ namespace Brainstorm.Areas.Identity.Pages.Account.Manage
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
+                    StatusMessage = "Có lỗi khi cập nhật số điện thoại.";
                     return RedirectToPage();
                 }
             }
 
+            var claims = await _userManager.GetClaimsAsync(user);
+            var currentFullName = claims.FirstOrDefault(c => c.Type == SD.Claim_FullName);
+            var currentAvatar = claims.FirstOrDefault(c => c.Type == SD.Claim_AvatarUrl);
+
+            if (string.IsNullOrWhiteSpace(Input.FullName))
+            {
+                if (currentFullName != null)
+                {
+                    await _userManager.RemoveClaimAsync(user, currentFullName);
+                }
+            }
+            else if (currentFullName == null)
+            {
+                await _userManager.AddClaimAsync(user, new Claim(SD.Claim_FullName, Input.FullName.Trim()));
+            }
+            else if (currentFullName.Value != Input.FullName.Trim())
+            {
+                await _userManager.ReplaceClaimAsync(user, currentFullName, new Claim(SD.Claim_FullName, Input.FullName.Trim()));
+            }
+
+            if (string.IsNullOrWhiteSpace(Input.AvatarUrl))
+            {
+                if (currentAvatar != null)
+                {
+                    await _userManager.RemoveClaimAsync(user, currentAvatar);
+                }
+            }
+            else if (currentAvatar == null)
+            {
+                await _userManager.AddClaimAsync(user, new Claim(SD.Claim_AvatarUrl, Input.AvatarUrl.Trim()));
+            }
+            else if (currentAvatar.Value != Input.AvatarUrl.Trim())
+            {
+                await _userManager.ReplaceClaimAsync(user, currentAvatar, new Claim(SD.Claim_AvatarUrl, Input.AvatarUrl.Trim()));
+            }
+
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Đã cập nhật hồ sơ thành công";
             return RedirectToPage();
         }
     }

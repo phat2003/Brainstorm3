@@ -1,39 +1,53 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Brainstorm.Utility
+@using System.Security.Claims
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
 @{
-    // 1. Lấy danh sách các tài khoản đang có vai trò là Admin
     var adminUsers = await UserManager.GetUsersInRoleAsync(SD.Role_User_Admin);
-
-    // 2. Kiểm tra xem danh sách có phần tử nào không (true nếu đã có ít nhất 1 admin)
     bool hasAdmin = adminUsers.Any();
+
+    var userName = UserManager.GetUserName(User) ?? "User";
+    var fullName = User.FindFirstValue(SD.Claim_FullName);
+    var avatarUrl = User.FindFirstValue(SD.Claim_AvatarUrl);
+    var avatarFallback = $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(fullName ?? userName)}&background=6f42c1&color=fff&rounded=true";
 }
 
-<ul class="navbar-nav">
+<ul class="navbar-nav align-items-sm-center gap-1">
 @if (SignInManager.IsSignedIn(User))
 {
-        @if (User.Identity.IsAuthenticated && User.IsInRole(SD.Role_User_Admin))
-        {
-            <li class="nav-item">
-                <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    <li class="nav-item dropdown user-menu">
+        <a class="nav-link p-0" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="@(string.IsNullOrWhiteSpace(avatarUrl) ? avatarFallback : avatarUrl)"
+                 class="user-avatar"
+                 alt="avatar" />
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+            <li>
+                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Tài khoản</a>
             </li>
-        }
-    <li class="nav-item">
-        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-    </li>
-        
-    <li class="nav-item">
-        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
-        </form>
+            @if (User.IsInRole(SD.Role_User_Admin))
+            {
+                <li>
+                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Tạo user</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" asp-area="Admin" asp-controller="User" asp-action="Index">Quản lý user</a>
+                </li>
+            }
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+                <form id="logoutForm" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "Staff" })">
+                    <button id="logout" type="submit" class="dropdown-item">Đăng xuất</button>
+                </form>
+            </li>
+        </ul>
     </li>
 }
 else
 {
-    // 3. Chỉ hiển thị nút Register nếu chưa có Admin (!hasAdmin)
     @if (!hasAdmin)
     {
         <li class="nav-item">
@@ -43,6 +57,5 @@ else
     <li class="nav-item">
         <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </li>
-
 }
 </ul>

@@ -8,18 +8,38 @@
 <h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 <div class="row">
-    <div class="col-md-6">
-        <form id="profile-form" method="post">
+    <div class="col-md-8 col-lg-6">
+        <form id="profile-form" method="post" class="profile-card">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
-                <label asp-for="Username" class="form-label"></label>
+
+            <div class="text-center mb-3">
+                <img id="profile-avatar-preview" class="profile-avatar-preview" alt="Avatar preview" />
             </div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
+                <input asp-for="Username" class="form-control" disabled />
+                <label asp-for="Username" class="form-label"></label>
+                <div class="form-text">Email/username không được thay đổi.</div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.FullName" class="form-control" placeholder="Nhập họ tên" />
+                <label asp-for="Input.FullName" class="form-label"></label>
+                <span asp-validation-for="Input.FullName" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.AvatarUrl" class="form-control" placeholder="https://..." id="avatarUrlInput" />
+                <label asp-for="Input.AvatarUrl" class="form-label"></label>
+                <span asp-validation-for="Input.AvatarUrl" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
                 <label asp-for="Input.PhoneNumber" class="form-label"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
+
             <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
         </form>
     </div>
@@ -27,4 +47,24 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const avatarInput = document.getElementById('avatarUrlInput');
+            const preview = document.getElementById('profile-avatar-preview');
+            if (!avatarInput || !preview) return;
+
+            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent('@Model.Username')}&background=6f42c1&color=fff&rounded=true`;
+            const applyAvatar = () => {
+                const value = avatarInput.value?.trim();
+                preview.src = value || fallback;
+            };
+
+            preview.onerror = () => {
+                preview.src = fallback;
+            };
+
+            avatarInput.addEventListener('input', applyAvatar);
+            applyAvatar();
+        })();
+    </script>
 }
